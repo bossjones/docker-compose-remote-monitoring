@@ -1,0 +1,141 @@
+version: '3.8'
+
+networks:
+  monitoring:
+
+# Since only root has access to /var/lib/docker and I'm running the Grafana agent under its own user on the host itself, changing the permissions to that directory seemed like a bad idea to me. After a bit of research I figured out how to make this work using the journald driver, which works nicely.
+# SOURCE: https://gist.github.com/ruanbekker/c6fa9bc6882e6f324b4319c5e3622460?permalink_comment_id=4009155#gistcomment-4009155
+
+x-logging:
+  &default-logging
+  driver: "journald"
+  options:
+    tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+services:
+  whoami:
+    image: "traefik/whoami:v1.8.0"
+    container_name: "whoami"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.scarlettlab.home`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
+      - "traefik.http.routers.whoami.service=whoami"
+      - "traefik.http.services.whoami.loadbalancer.server.port=10080"
+      - "traefik.port=10080"
+    expose:
+      - 10080
+    environment:
+    #- TZ=UTC
+    - WHOAMI_PORT_NUMBER=10080
+    - WHOAMI_NAME=whoami
+    ports:
+    - 10080:10080
+    networks:
+    - monitoring
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  # scope:
+  #   image: "weaveworks/scope:1.13.2"
+  #   network_mode: "host"
+  #   pid: "host"
+  #   privileged: true
+  #   labels:
+  #     - "works.weave.role=system"
+  #   volumes:
+  #     - "/var/run/docker.sock:/var/run/docker.sock:rw"
+  #   command:
+  #     - "--probe.docker=true"
+  #     - "--weave=false"
+  #     - "--app.http.address=:4041"
+  #   container_name: scope
+  #   cap_add:
+  #     - NET_ADMIN # Required if you are using Pi-hole as your DHCP server, else not needed
+  #   restart: unless-stopped
+
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.node-exporter.rule=Host(`node-exporter.scarlettlab.home`)"
+    - "traefik.http.routers.node-exporter.entrypoints=web"
+    - "traefik.http.routers.node-exporter.service=node-exporter"
+    - "traefik.http.services.node-exporter.loadbalancer.server.port=9100"
+    - "traefik.port=9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      -  '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+    - 9100
+    ports:
+      - 9100:9100
+    restart: always
+    deploy:
+      mode: global
+    networks:
+    - monitoring
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  cadvisor:
+    # SOURCE: https://github.com/rafaribe/home-ops/blob/d9e283fd3ddc42a9891c8a12fe82fa128657798a/provision/ansible/backup-server/roles/syncthing/templates/agent.yml
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: cadvisor
+    privileged: true
+    userns_mode: "host"
+    pid: "host"
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.cadvisor.rule=Host(`cadvisor.scarlettlab.home`)"
+    - "traefik.http.routers.cadvisor.entrypoints=web"
+    - "traefik.http.routers.cadvisor.service=cadvisor"
+    - "traefik.http.services.cadvisor.loadbalancer.server.port=8081"
+    - "traefik.port=8081"
+    volumes:
+        - /:/rootfs:ro
+        - /var/run:/var/run:ro
+        - /sys:/sys:ro
+        - /var/lib/docker/:/var/lib/docker:ro
+        - /dev/disk/:/dev/disk:ro
+        - /etc/machine-id/:/etc/machine-id:ro
+    devices:
+        - /dev/kmsg:/dev/kmsg:ro
+    ports:
+        - "8081:8081"
+    expose:
+      - 8081
+    restart: always
+    entrypoint:
+      - /usr/bin/cadvisor
+      - '--max_procs=2'
+      - '--listen_ip=0.0.0.0'
+      - '--port=8081'
+      - '--logtostderr'
+      - '--machine_id_file="/etc/machine-id"'
+      - '--enable_metrics=advtcp,app,cpu,cpu_topology,cpuset,disk,diskIO,hugetlb,memory,memory_numa,network,oom_event,percpu,perf_event,process,resctrl,sched,tcp,udp'
+      - '--disable_metrics=referenced_memory,cpuLoad'
+    # env_file:
+    #   - ./env
+    networks:
+    - monitoring
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
