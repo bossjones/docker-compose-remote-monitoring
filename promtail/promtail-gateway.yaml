@@ -10,7 +10,9 @@ clients:
   - url: http://loki-gateway.scarlettlab.home/loki/api/v1/push
     external_labels:
       cluster: k3d
+      nodename: ${HOST}
       instance: ${HOST}
+      host: ${HOST}
     tenant_id: docker
     backoff_config:
       min_period: 100ms
@@ -26,7 +28,7 @@ scrape_configs:
       path: /var/log/journal
       labels:
         job: systemd-journal
-        instance: ${HOST}
+        # instance: ${HOST}
     relabel_configs:
       - source_labels: ["__journal__systemd_unit"]
         target_label: "unit"
@@ -90,8 +92,6 @@ scrape_configs:
         selector: '{name="promtail"}'
         action: drop
         drop_counter_reason: promtail_noisy_error
-    - static_labels:
-        host: ${HOST}
     # - metrics:
     #     log_lines_total:
     #       type: Counter
