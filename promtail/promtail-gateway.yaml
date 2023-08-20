@@ -21,6 +21,14 @@ clients:
 
 # SOURCE: https://community.grafana.com/t/add-container-name-to-promtail-docker-logs/58572/5
 scrape_configs:
+  - job_name: system
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: varlogs
+        __path__: /var/log/*log
+
   - job_name: journal
     journal:
       json: false
