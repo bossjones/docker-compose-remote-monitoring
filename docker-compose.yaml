@@ -26,6 +26,7 @@ services:
       - "traefik.http.routers.whoami.service=whoami"
       - "traefik.http.services.whoami.loadbalancer.server.port=10080"
       - "traefik.port=10080"
+      - "mylabel=true"
     expose:
       - 10080
     environment:
@@ -74,6 +75,7 @@ services:
     - "traefik.http.routers.node-exporter.service=node-exporter"
     - "traefik.http.services.node-exporter.loadbalancer.server.port=9100"
     - "traefik.port=9100"
+    - "mylabel=true"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -111,6 +113,7 @@ services:
     - "traefik.http.routers.cadvisor.service=cadvisor"
     - "traefik.http.services.cadvisor.loadbalancer.server.port=8081"
     - "traefik.port=8081"
+    - "mylabel=true"
     volumes:
         - /:/rootfs:ro
         - /var/run:/var/run:ro

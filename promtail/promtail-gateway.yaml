@@ -70,28 +70,37 @@ scrape_configs:
     docker_sd_configs:
       - host: unix:///var/run/docker.sock
         refresh_interval: 5s
+        filters:
+          - name: label
+            values: ["mylabel=true"]
         # filters:
         #   - name: name
         #     values: [flog]
     # labels:
     #   job: "docker"
     #   instance: ${HOST}
-    relabel_configs:
-      - source_labels: ['__meta_docker_container_name']
-        regex: '/(.*)\.[0-9]\..*'
-        target_label: 'name'
-      - source_labels: ['__meta_docker_container_name']
-        regex: '/(.*)\.[0-9a-z]*\..*'
-        target_label: 'name'
-      - source_labels: ['__meta_docker_container_name']
-        regex: '/.*\.([0-9]{1,2})\..*'
-        target_label: 'replica'
+
     pipeline_stages:
     - docker: {}
+    - static_labels:
+        job: "docker"
     - match:
         selector: '{name="promtail"}'
         action: drop
         drop_counter_reason: promtail_noisy_error
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      # - source_labels: ['__meta_docker_container_name']
+      #   regex: '/(.*)\.[0-9]\..*'
+      #   target_label: 'name'
+      # - source_labels: ['__meta_docker_container_name']
+      #   regex: '/(.*)\.[0-9a-z]*\..*'
+      #   target_label: 'name'
+      # - source_labels: ['__meta_docker_container_name']
+      #   regex: '/.*\.([0-9]{1,2})\..*'
+      #   target_label: 'replica'
     # - metrics:
     #     log_lines_total:
     #       type: Counter
