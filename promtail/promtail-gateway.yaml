@@ -90,7 +90,7 @@ scrape_configs:
         action: drop
         drop_counter_reason: promtail_noisy_error
     - static_labels:
-        host: "{{ hostname }}"
+        host: ${HOST}
     # - metrics:
     #     log_lines_total:
     #       type: Counter
