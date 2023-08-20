@@ -131,11 +131,38 @@ services:
       - '--machine_id_file="/etc/machine-id"'
       - '--enable_metrics=advtcp,app,cpu,cpu_topology,cpuset,disk,diskIO,hugetlb,memory,memory_numa,network,oom_event,percpu,perf_event,process,resctrl,sched,tcp,udp'
       - '--disable_metrics=referenced_memory,cpuLoad'
-    # env_file:
-    #   - ./env
     networks:
     - monitoring
     logging:
       driver: json-file
       options:
         tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  promtail:
+    # SOURCE: https://github.com/gilmrt/docker-compose/blob/5d8d7b3746fba48ba5f559f9913e56ae3d881eee/metrics/docker-compose.yml
+    container_name: promtail
+    image: grafana/promtail:2.8.3
+    restart: always
+    volumes:
+      # - /var/log:/var/log:ro
+      - ./promtail/promtail-gateway.yaml:/etc/promtail/promtail-gateway.yaml:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - ./promtail/var/run/promtail:/var/run/promtail
+      # to read container labels and logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    labels:
+      - "logging=promtail"
+    ports:
+      - "9080:9080"
+    expose:
+    - 9080
+    command:
+    - '-config.file=/etc/promtail/promtail-gateway.yaml'
+    - '--inspect'
+    tty: true
+    stdin_open: true
+    networks:
+    - monitoring
