@@ -85,6 +85,7 @@ scrape_configs:
         regex: '/.*\.([0-9]{1,2})\..*'
         target_label: 'replica'
     pipeline_stages:
+    - docker: {}
     - match:
         selector: '{name="promtail"}'
         action: drop
