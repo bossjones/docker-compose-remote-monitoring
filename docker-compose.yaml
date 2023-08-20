@@ -3,6 +3,9 @@ version: '3.8'
 networks:
   monitoring:
 
+volumes:
+  promtail_tmp: {}
+
 # Since only root has access to /var/lib/docker and I'm running the Grafana agent under its own user on the host itself, changing the permissions to that directory seemed like a bad idea to me. After a bit of research I figured out how to make this work using the journald driver, which works nicely.
 # SOURCE: https://gist.github.com/ruanbekker/c6fa9bc6882e6f324b4319c5e3622460?permalink_comment_id=4009155#gistcomment-4009155
 
@@ -145,6 +148,7 @@ services:
     restart: always
     volumes:
       # - /var/log:/var/log:ro
+      - promtail_tmp:/tmp
       - ./promtail/promtail-gateway.yaml:/etc/promtail/promtail-gateway.yaml:ro
       - /var/log/journal:/var/log/journal:ro
       - /run/log/journal:/run/log/journal:ro
