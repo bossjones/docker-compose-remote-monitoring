@@ -172,7 +172,7 @@ services:
     - '--inspect'
     - '-config.expand-env=true'
     environment:
-    - NODENAME=${HOST}
+    - "NODENAME=${HOST}"
     tty: true
     stdin_open: true
     networks:
