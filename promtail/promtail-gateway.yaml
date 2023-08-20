@@ -7,7 +7,7 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://192.168.3.16:80/loki/api/v1/push
+  - url: http://loki-gateway.scarlettlab.home/loki/api/v1/push
     external_labels:
       cluster: k3d
     tenant_id: docker

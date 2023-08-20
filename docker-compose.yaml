@@ -174,3 +174,7 @@ services:
     stdin_open: true
     networks:
     - monitoring
+    dns:
+      - "192.168.3.16"
+      - "1.1.1.2"
+      - "1.0.0.2"
