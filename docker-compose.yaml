@@ -161,6 +161,7 @@ services:
     - 9080
     command:
     - '-config.file=/etc/promtail/promtail-gateway.yaml'
+    - '--dry-run'
     - '--inspect'
     - '-config.expand-env=true'
     environment:
