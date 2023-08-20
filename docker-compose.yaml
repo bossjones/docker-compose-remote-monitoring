@@ -162,6 +162,9 @@ services:
     command:
     - '-config.file=/etc/promtail/promtail-gateway.yaml'
     - '--inspect'
+    - '-config.expand-env=true'
+    environment:
+    - HOST
     tty: true
     stdin_open: true
     networks:

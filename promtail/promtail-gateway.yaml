@@ -25,6 +25,7 @@ scrape_configs:
       path: /var/log/journal
       labels:
         job: systemd-journal
+        instance: ${HOST}
     relabel_configs:
       - source_labels: ["__journal__systemd_unit"]
         target_label: "unit"
