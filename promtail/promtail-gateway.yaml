@@ -1,7 +1,7 @@
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
-  log_level: "info"
+  log_level: "debug"
 
 positions:
   filename: /tmp/positions.yaml
@@ -40,24 +40,24 @@ scrape_configs:
           selector: '{unit="iwlwifi.service"}'
           action: drop
           drop_counter_reason: promtail_noisy_error
-      - metrics:
-          log_lines_total:
-            type: Counter
-            description: "total number of log lines"
-            prefix: my_promtail_custom_
-            max_idle_duration: 24h
-            config:
-              match_all: true
-              action: inc
-          log_bytes_total:
-            type: Counter
-            description: "total bytes of log lines"
-            prefix: my_promtail_custom_
-            max_idle_duration: 24h
-            config:
-              match_all: true
-              count_entry_bytes: true
-              action: add
+      # - metrics:
+      #     log_lines_total:
+      #       type: Counter
+      #       description: "total number of log lines"
+      #       prefix: my_promtail_custom_
+      #       max_idle_duration: 24h
+      #       config:
+      #         match_all: true
+      #         action: inc
+      #     log_bytes_total:
+      #       type: Counter
+      #       description: "total bytes of log lines"
+      #       prefix: my_promtail_custom_
+      #       max_idle_duration: 24h
+      #       config:
+      #         match_all: true
+      #         count_entry_bytes: true
+      #         action: add
 
   - job_name: docker_scrape
     docker_sd_configs:
@@ -87,21 +87,21 @@ scrape_configs:
         selector: '{name="promtail"}'
         action: drop
         drop_counter_reason: promtail_noisy_error
-    - metrics:
-        log_lines_total:
-          type: Counter
-          description: "total number of log lines"
-          prefix: my_promtail_custom_
-          max_idle_duration: 24h
-          config:
-            match_all: true
-            action: inc
-        log_bytes_total:
-          type: Counter
-          description: "total bytes of log lines"
-          prefix: my_promtail_custom_
-          max_idle_duration: 24h
-          config:
-            match_all: true
-            count_entry_bytes: true
-            action: add
+    # - metrics:
+    #     log_lines_total:
+    #       type: Counter
+    #       description: "total number of log lines"
+    #       prefix: my_promtail_custom_
+    #       max_idle_duration: 24h
+    #       config:
+    #         match_all: true
+    #         action: inc
+    #     log_bytes_total:
+    #       type: Counter
+    #       description: "total bytes of log lines"
+    #       prefix: my_promtail_custom_
+    #       max_idle_duration: 24h
+    #       config:
+    #         match_all: true
+    #         count_entry_bytes: true
+    #         action: add
