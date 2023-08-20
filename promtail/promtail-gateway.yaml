@@ -89,6 +89,8 @@ scrape_configs:
         selector: '{name="promtail"}'
         action: drop
         drop_counter_reason: promtail_noisy_error
+    - static_labels:
+        host: "{{ hostname }}"
     # - metrics:
     #     log_lines_total:
     #       type: Counter
