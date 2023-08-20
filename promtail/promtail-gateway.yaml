@@ -90,9 +90,6 @@ scrape_configs:
 
     pipeline_stages:
     - docker: {}
-    - timestamp:
-        source: time
-        format: RFC3339Nano
     - static_labels:
         job: "docker"
     - match:
