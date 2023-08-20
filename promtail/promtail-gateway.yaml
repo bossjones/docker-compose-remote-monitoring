@@ -70,8 +70,9 @@ scrape_configs:
         # filters:
         #   - name: name
         #     values: [flog]
-        # labels:
-        #   job: "docker"
+    labels:
+      job: "docker"
+      instance: ${HOST}
     relabel_configs:
       - source_labels: ['__meta_docker_container_name']
         regex: '/(.*)\.[0-9]\..*'
