@@ -1,0 +1,57 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: "info"
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki-gateway.scarlettlab.home/loki/api/v1/push
+    external_labels:
+      cluster: k3d
+      nodename: pve1
+      instance: pve1
+      host: pve1
+    tenant_id: docker
+    backoff_config:
+      min_period: 100ms
+      max_period: 10s
+      max_retries: 10
+
+# SOURCE: https://community.grafana.com/t/add-container-name-to-promtail-docker-logs/58572/5
+scrape_configs:
+  - job_name: system
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: varlogs
+        __path__: /var/log/*log
+
+  - job_name: journal
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      labels:
+        job: systemd-journal
+        # instance: pve1
+    relabel_configs:
+      - source_labels: ["__journal__systemd_unit"]
+        target_label: "unit"
+      - source_labels: ["__journal__hostname"]
+        target_label: host
+      - source_labels: ["__journal_priority_keyword"]
+        target_label: level
+      - source_labels: ["__journal_syslog_identifier"]
+        target_label: syslog_identifier
+    pipeline_stages:
+      - match:
+          selector: '{unit="iwlwifi.service"}'
+          action: drop
+          drop_counter_reason: promtail_noisy_error
+      - match:
+          selector: '{unit="init.scope"}'
+          action: drop
+          drop_counter_reason: promtail_noisy_error
