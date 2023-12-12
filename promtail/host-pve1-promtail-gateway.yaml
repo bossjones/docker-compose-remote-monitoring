@@ -28,6 +28,10 @@ scrape_configs:
       labels:
         job: varlogs
         __path__: /var/log/*log
+    pipeline_stages:
+    - drop:
+        expression: ".*successful auth for user 'pve-exporter@pve'.*"
+        # source: fluentd_message
 
   - job_name: journal
     journal:

@@ -23,7 +23,8 @@ chown promtail:promtail /tmp/positions.yaml
 
 systemctl cat promtail
 
-cp -a ../../promtail/host-promtail-gateway.yaml /etc/promtail/config.yml
+# cp -a ../../promtail/host-promtail-gateway.yaml /etc/promtail/config.yml
+cp -a ../../promtail/host-pve1-promtail-gateway.yaml /etc/promtail/config.yml
 
 # ---------------------------------
 
