@@ -32,6 +32,7 @@ cp -a ../../promtail/host-pve1-promtail-gateway.yaml /etc/promtail/config.yml
 mkdir -p /etc/systemd/system/promtail.service.d/ || true
 cat <<EOF >/etc/systemd/system/promtail.service.d/overrides.conf
 [Service]
+User=root
 Environment=NODENAME=$(hostname)
 EOF
 
