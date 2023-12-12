@@ -21,6 +21,7 @@ clients:
 
 # SOURCE: https://community.grafana.com/t/add-container-name-to-promtail-docker-logs/58572/5
 scrape_configs:
+
   - job_name: system
     static_configs:
     - targets:
@@ -31,7 +32,18 @@ scrape_configs:
     pipeline_stages:
     - drop:
         expression: ".*successful auth for user 'pve-exporter@pve'.*"
-        # source: fluentd_message
+
+  - job_name: system-extended
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: varlogs
+        __path__: /var/log/**/*log
+    pipeline_stages:
+    - drop:
+        expression: ".*successful auth for user 'pve-exporter@pve'.*"
+
 
   - job_name: journal
     journal:
