@@ -44,6 +44,17 @@ scrape_configs:
     - drop:
         expression: ".*successful auth for user 'pve-exporter@pve'.*"
 
+  - job_name: pve-tasks
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: varlogs
+        __path__:  /var/log/pve/tasks/**/*
+    pipeline_stages:
+    - drop:
+        expression: ".*successful auth for user 'pve-exporter@pve'.*"
+
 
   - job_name: journal
     journal:
