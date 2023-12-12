@@ -32,6 +32,8 @@ scrape_configs:
     pipeline_stages:
     - drop:
         expression: ".*successful auth for user 'pve-exporter@pve'.*"
+    - drop:
+        expression: ".*msg=\"failed to tail file\" error=\"file is a directory\".*"
 
   - job_name: system-extended
     static_configs:
