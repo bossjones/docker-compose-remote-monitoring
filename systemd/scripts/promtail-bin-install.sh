@@ -5,6 +5,8 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
+echo "192.168.3.16 loki-gateway.scarlettlab.home loki-gateway" | sudo tee -a /etc/hosts
+
 cd ~/ || exit
 
 wget https://github.com/grafana/loki/releases/download/v2.8.3/promtail_2.8.3_amd64.deb
