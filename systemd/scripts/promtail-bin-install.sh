@@ -7,7 +7,7 @@ fi
 
 echo "192.168.3.16 loki-gateway.scarlettlab.home loki-gateway" | sudo tee -a /etc/hosts
 
-cd ~/ || exit
+# cd ~/ || exit
 
 wget https://github.com/grafana/loki/releases/download/v2.8.3/promtail_2.8.3_amd64.deb
 
@@ -27,6 +27,7 @@ systemctl cat promtail
 
 # cp -a ../../promtail/host-promtail-gateway.yaml /etc/promtail/config.yml
 cp -a ../../promtail/host-pve1-promtail-gateway.yaml /etc/promtail/config.yml
+cp -a ../../promtail/host-boss-station-promtail-gateway.yaml /etc/promtail/config.yml
 
 # ---------------------------------
 

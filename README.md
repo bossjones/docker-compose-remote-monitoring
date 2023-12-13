@@ -26,3 +26,12 @@ Update: The env variable of course needs to be set on the host's systemd-journal
 `SYSTEMD_JOURNAL_COMPACT=0`
 
 source: https://github.com/grafana/loki/issues/8163
+
+
+# node-exporter
+
+```
+git clone https://github.com/carlocorradini/node_exporter_installer
+cd node_exporter_installer
+INSTALL_NODE_EXPORTER_SKIP_FIREWALL=1 INSTALL_NODE_EXPORTER_SKIP_SELINUX=1 INSTALL_NODE_EXPORTER_EXEC='--path.procfs=/proc --path.rootfs=/ --path.sysfs=/sys --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)' ./install.sh
+```
