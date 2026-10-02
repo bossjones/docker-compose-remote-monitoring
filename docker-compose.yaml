@@ -101,7 +101,7 @@ services:
 
   cadvisor:
     # SOURCE: https://github.com/rafaribe/home-ops/blob/d9e283fd3ddc42a9891c8a12fe82fa128657798a/provision/ansible/backup-server/roles/syncthing/templates/agent.yml
-    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    image: gcr.io/cadvisor/cadvisor:v0.55.1
     container_name: cadvisor
     privileged: true
     userns_mode: "host"
@@ -120,7 +120,7 @@ services:
         - /sys:/sys:ro
         - /var/lib/docker/:/var/lib/docker:ro
         - /dev/disk/:/dev/disk:ro
-        - /etc/machine-id/:/etc/machine-id:ro
+        - /etc/machine-id:/etc/machine-id:ro
     devices:
         - /dev/kmsg:/dev/kmsg:ro
     ports:
@@ -134,9 +134,22 @@ services:
       - '--listen_ip=0.0.0.0'
       - '--port=8081'
       - '--logtostderr'
-      - '--machine_id_file="/etc/machine-id"'
-      - '--enable_metrics=advtcp,app,cpu,cpu_topology,cpuset,disk,diskIO,hugetlb,memory,memory_numa,network,oom_event,percpu,perf_event,process,resctrl,sched,tcp,udp'
-      - '--disable_metrics=referenced_memory,cpuLoad'
+      - '--machine_id_file=/etc/machine-id'
+      # Only track containers, not every systemd cgroup.
+      - '--docker_only=true'
+      # Default is 1s per container; match the 15s Prometheus scrape instead.
+      - '--housekeeping_interval=15s'
+      - '--max_housekeeping_interval=30s'
+      - '--store_container_labels=false'
+      - '--whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service'
+      # advtcp/tcp/udp/process/perf_event/sched/etc. are expensive (advtcp alone was ~15k series).
+      - '--enable_metrics=cpu,cpuset,disk,diskIO,memory,network,oom_event'
+    healthcheck:
+      # Image's built-in healthcheck targets :8080; we listen on 8081.
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8081/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     networks:
     - monitoring
     logging:
